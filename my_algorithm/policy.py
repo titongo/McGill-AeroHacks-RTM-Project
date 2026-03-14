@@ -1,5 +1,5 @@
-from aerohacks.policy.base import Policy
-from aerohacks.core.models import Observation, Plan, ActionStep, ActionType, Position2D
+from aerohacks.policy.base import Policy # type: ignore
+from aerohacks.core.models import Observation, Plan, ActionStep, ActionType, Position2D # type: ignore
 import math
 
 class MyPolicy(Policy):
@@ -10,6 +10,9 @@ class MyPolicy(Policy):
     """
     
     def step(self, obs: Observation) -> Plan:
+        print(obs.active_constraints)  # Debug: Print active constraints to understand the environment
+        print(obs.traffic_tracks)  # Debug: Print traffic tracks to see other drones in the airspace
+
         steps = []
         
         # We need to output exactly 5 steps into the future.

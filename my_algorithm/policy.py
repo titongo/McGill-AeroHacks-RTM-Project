@@ -4,56 +4,111 @@ import math
 
 MIN_NORMAL_ALT = 1
 MAX_NORMAL_ALT = 4
+ADVISORY_SEPARATION = 100.0 # in meters, this is the threshold for triggering a detour around traffic
+DETOUR_OFFSET = 150.0 # in meters, how far to the side to step when detouring around traffic
 
 def clamp_normal_alt(alt_layer: int) -> int:
     return max(MIN_NORMAL_ALT, min(MAX_NORMAL_ALT, int(alt_layer)))
 
+def distance_2D(a: Position2D, b: Position2D) -> float:
+    return math.hypot(a.x - b.x, a.y - b.y)
+
+def near_traffic(pos: Position2D, alt: int, traffic_tracks) -> bool:
+    """Return True if pos is within ADVISORY_SEPARATION of any traffic at the same altitude layer."""
+    for t in traffic_tracks:
+        if t.alt_layer == alt and distance_2D(pos, t.position) <= ADVISORY_SEPARATION:
+            return True
+    return False
+
 class MyPolicy(Policy):
     """
-    BASELINE ALGORITHM: This is your starting point.
-    It simply flies in a straight line towards the goal, ignoring any NO-FLY zones or traffic.
-    You will need to improve this to avoid penalties!
+    NEW ALGORITHM:
+    Flies toward the goal while actively avoiding nearby traffic.
+    On each tick:
+      - Direct waypoint is used if clear of traffic.
+      - Left/right perpendicular detours are tried if direct path is blocked.
+      - HOLD is used as a last resort when all lateral options are also blocked.
     """
-    
+
     def step(self, obs: Observation) -> Plan:
         steps = []
-        
-        # We need to output exactly 5 steps into the future.
         current_pos = obs.ownship_state.position
         goal_pos = obs.mission_goal.region.center()
-        
-        # Calculate angle to goal
+        traffic = obs.traffic_tracks
+
+        desired_alt = (
+            obs.mission_goal.target_alt_layer
+            if obs.mission_goal.target_alt_layer is not None
+            else obs.ownship_state.alt_layer
+        )
+        safe_alt = clamp_normal_alt(desired_alt)
+
         dx = goal_pos.x - current_pos.x
         dy = goal_pos.y - current_pos.y
         dist = math.hypot(dx, dy)
-        
-        # Maximum speed per step is 15.0m
         speed = min(15.0, dist)
-        desired_alt = obs.mission_goal.target_alt_layer if obs.mission_goal.target_alt_layer is not None else obs.ownship_state.alt_layer
-        safe_alt = clamp_normal_alt(desired_alt)
-        
-        # PR-FIX: Build waypoints incrementally and cap at goal to prevent overshoot
+
+        # Build unit vector toward the goal for detour direction calculations
+        if dist > 0:
+            ux, uy = dx / dist, dy / dist
+        else:
+            ux, uy = 1.0, 0.0
+
+        perp_left = (-uy, ux)
+        perp_right = (uy, -ux)
+
         next_pos = current_pos
-        for i in range(5):
+        for _ in range(5):
             remaining_dx = goal_pos.x - next_pos.x
             remaining_dy = goal_pos.y - next_pos.y
             remaining_dist = math.hypot(remaining_dx, remaining_dy)
 
             if remaining_dist > 0:
-                step_distance = min(speed, remaining_dist)
-                step_x = next_pos.x + (remaining_dx / remaining_dist) * step_distance
-                step_y = next_pos.y + (remaining_dy / remaining_dist) * step_distance
+                step_dist = min(speed, remaining_dist)
+                rdx, rdy = remaining_dx / remaining_dist, remaining_dy / remaining_dist
+                candidate = Position2D(
+                    x=next_pos.x + rdx * step_dist,
+                    y=next_pos.y + rdy * step_dist,
+                )
             else:
-                step_x, step_y = goal_pos.x, goal_pos.y
+                candidate = Position2D(x=goal_pos.x, y=goal_pos.y)
 
-            next_pos = Position2D(x=step_x, y=step_y)
-                
-            steps.append(
-                ActionStep(
+            if not near_traffic(candidate, safe_alt, traffic):
+                # Direct path is clear -> proceed toward the goal
+                next_pos = candidate
+                steps.append(ActionStep(
                     action_type=ActionType.WAYPOINT,
                     target_position=next_pos,
-                    target_alt_layer=safe_alt
+                    target_alt_layer=safe_alt,
+                ))
+            else:
+                # Direct path blocked —> try perpendicular detours
+                left_pos = Position2D(
+                    x=next_pos.x + ux * speed + perp_left[0] * DETOUR_OFFSET,
+                    y=next_pos.y + uy * speed + perp_left[1] * DETOUR_OFFSET,
                 )
-            )
-            
+                right_pos = Position2D(
+                    x=next_pos.x + ux * speed + perp_right[0] * DETOUR_OFFSET,
+                    y=next_pos.y + uy * speed + perp_right[1] * DETOUR_OFFSET,
+                )
+                # Check left detour first, then right
+                if not near_traffic(left_pos, safe_alt, traffic):
+                    next_pos = left_pos
+                    steps.append(ActionStep(
+                        action_type=ActionType.WAYPOINT,
+                        target_position=next_pos,
+                        target_alt_layer=safe_alt,
+                    ))
+                elif not near_traffic(right_pos, safe_alt, traffic):
+                    next_pos = right_pos
+                    steps.append(ActionStep(
+                        action_type=ActionType.WAYPOINT,
+                        target_position=next_pos,
+                        target_alt_layer=safe_alt,
+                    ))
+                else:
+                    # Both detours also blocked — hold in place this step
+                    steps.append(ActionStep(action_type=ActionType.HOLD))
+                    # next_pos remains unchanged, so try again from the same spot
+
         return Plan(steps=steps)

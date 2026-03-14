@@ -51,6 +51,9 @@ def parse_playback_series(playback_raw):
     xs = [float(row["x"]) for row in playback]
     ys = [float(row["y"]) for row in playback]
     alt_layers = [int(row["alt_layer"]) for row in playback]
+    for index, alt in enumerate(alt_layers):
+        if alt < 0 or alt > 4:
+            raise ValueError(f"Invalid alt_layer at index {index}: {alt} (expected 0..4)")
     energies = [float(row["energy"]) for row in playback]
     return playback, times, xs, ys, alt_layers, energies
 
@@ -116,8 +119,8 @@ def get_recent_traffic_trail(segment, time_value, trail_steps=25):
 def main():
     parser = argparse.ArgumentParser(description="Interactive playback viewer with slider")
     parser.add_argument("--playback", default="playback.json", help="Playback JSON path")
-    parser.add_argument("--scenario", default="scenario.json", help="Scenario JSON path for map bounds")
-    parser.add_argument("--hidden", default="aerohacks/dummy_hidden.json", help="Hidden events JSON path for NOTAMs/NPC traffic")
+    parser.add_argument("--scenario", default="scenarios/public/example_training.json", help="Scenario JSON path for map bounds")
+    parser.add_argument("--hidden", default="scenarios/hidden/example_training.json", help="Hidden events JSON path for NOTAMs/NPC traffic")
     args = parser.parse_args()
 
     if not os.path.exists(args.playback):
@@ -341,9 +344,10 @@ def main():
             npc_trails[trace_index].set_alpha(0.85 if npc_alt == ownship_alt else 0.35)
 
         if npc_points:
+            npc_scatter.set_visible(True)
             npc_scatter.set_offsets(npc_points)
         else:
-            npc_scatter.set_offsets([])
+            npc_scatter.set_visible(False)
 
         status_text.set_text(
             f"time={t}\n"

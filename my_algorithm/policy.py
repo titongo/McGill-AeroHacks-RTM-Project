@@ -58,6 +58,7 @@ class MyPolicy(Policy):
         perp_right = (uy, -ux)
 
         next_pos = current_pos
+        # Plan up to 5 steps ahead, then adjust based on traffic
         for _ in range(5):
             remaining_dx = goal_pos.x - next_pos.x
             remaining_dy = goal_pos.y - next_pos.y

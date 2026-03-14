@@ -4,8 +4,8 @@ import math
 
 MIN_NORMAL_ALT = 1
 MAX_NORMAL_ALT = 4
-ADVISORY_SEPARATION = 100.0 # in meters, this is the threshold for triggering a detour around traffic
-DETOUR_OFFSET = 150.0 # in meters, how far to the side to step when detouring around traffic
+ADVISORY_SEPARATION = 180.0 # in meters, this is the threshold for triggering a detour around traffic
+DETOUR_OFFSET = 320.0 # in meters, how far to the side to step when detouring around traffic
 
 def clamp_normal_alt(alt_layer: int) -> int:
     return max(MIN_NORMAL_ALT, min(MAX_NORMAL_ALT, int(alt_layer)))

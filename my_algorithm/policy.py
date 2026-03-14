@@ -20,6 +20,57 @@ def near_traffic(pos: Position2D, alt: int, traffic_tracks) -> bool:
             return True
     return False
 
+def point_in_polygon(p: Position2D, vertices) -> bool:
+    """Ray-casting point-in-polygon test."""
+    inside = False
+    n = len(vertices)
+    if n < 3:
+        return False
+
+    px, py = p.x, p.y
+    j = n - 1
+    for i in range(n):
+        xi, yi = vertices[i].x, vertices[i].y
+        xj, yj = vertices[j].x, vertices[j].y
+
+        intersects = ((yi > py) != (yj > py)) and (
+            px < (xj - xi) * (py - yi) / ((yj - yi) if (yj - yi) != 0 else 1e-9) + xi
+        )
+        if intersects:
+            inside = not inside
+        j = i
+
+    return inside
+
+def point_in_region(p: Position2D, region) -> bool:
+    # Runtime objects may expose either dataclass fields or a type name; handle both safely.
+    region_type = getattr(region, "type", region.__class__.__name__)
+    if isinstance(region_type, str):
+        region_type = region_type.lower()
+
+    if "circle" in str(region_type).lower():
+        center = getattr(region, "center_pos", None)
+        radius = getattr(region, "radius", None)
+        if center is None or radius is None:
+            return False
+        return distance_2D(p, center) <= float(radius)
+
+    vertices = getattr(region, "vertices", None)
+    if not vertices:
+        return False
+    return point_in_polygon(p, vertices)
+
+def in_active_constraint(pos: Position2D, alt: int, active_constraints) -> bool:
+    # Return true if position is within any active constraint that applies to the given altitude layer
+    for constraint in active_constraints:
+        alt_layers = getattr(constraint, "alt_layers", [])
+        if alt not in alt_layers:
+            continue
+        region = getattr(constraint, "region", None)
+        if region is not None and point_in_region(pos, region):
+            return True
+    return False
+
 class MyPolicy(Policy):
     """
     NEW ALGORITHM:
@@ -35,6 +86,7 @@ class MyPolicy(Policy):
         current_pos = obs.ownship_state.position
         goal_pos = obs.mission_goal.region.center()
         traffic = obs.traffic_tracks
+        active_constraints = obs.active_constraints
 
         desired_alt = (
             obs.mission_goal.target_alt_layer
@@ -74,7 +126,7 @@ class MyPolicy(Policy):
             else:
                 candidate = Position2D(x=goal_pos.x, y=goal_pos.y)
 
-            if not near_traffic(candidate, safe_alt, traffic):
+            if (not near_traffic(candidate, safe_alt, traffic)) and (not in_active_constraint(candidate, safe_alt, active_constraints)):
                 # Direct path is clear -> proceed toward the goal
                 next_pos = candidate
                 steps.append(ActionStep(
@@ -93,14 +145,14 @@ class MyPolicy(Policy):
                     y=next_pos.y + uy * speed + perp_right[1] * DETOUR_OFFSET,
                 )
                 # Check left detour first, then right
-                if not near_traffic(left_pos, safe_alt, traffic):
+                if (not near_traffic(left_pos, safe_alt, traffic)) and (not in_active_constraint(left_pos, safe_alt, active_constraints)):
                     next_pos = left_pos
                     steps.append(ActionStep(
                         action_type=ActionType.WAYPOINT,
                         target_position=next_pos,
                         target_alt_layer=safe_alt,
                     ))
-                elif not near_traffic(right_pos, safe_alt, traffic):
+                elif (not near_traffic(right_pos, safe_alt, traffic)) and (not in_active_constraint(right_pos, safe_alt, active_constraints)):
                     next_pos = right_pos
                     steps.append(ActionStep(
                         action_type=ActionType.WAYPOINT,

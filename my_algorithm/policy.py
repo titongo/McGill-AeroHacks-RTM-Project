@@ -2,6 +2,12 @@ from aerohacks.policy.base import Policy
 from aerohacks.core.models import Observation, Plan, ActionStep, ActionType, Position2D
 import math
 
+MIN_NORMAL_ALT = 1
+MAX_NORMAL_ALT = 4
+
+def clamp_normal_alt(alt_layer: int) -> int:
+    return max(MIN_NORMAL_ALT, min(MAX_NORMAL_ALT, int(alt_layer)))
+
 class MyPolicy(Policy):
     """
     BASELINE ALGORITHM: This is your starting point.
@@ -23,6 +29,8 @@ class MyPolicy(Policy):
         
         # Maximum speed per step is 15.0m
         speed = min(15.0, dist)
+        desired_alt = obs.mission_goal.target_alt_layer if obs.mission_goal.target_alt_layer is not None else obs.ownship_state.alt_layer
+        safe_alt = clamp_normal_alt(desired_alt)
         
         # PR-FIX: Build waypoints incrementally and cap at goal to prevent overshoot
         next_pos = current_pos
@@ -44,7 +52,7 @@ class MyPolicy(Policy):
                 ActionStep(
                     action_type=ActionType.WAYPOINT,
                     target_position=next_pos,
-                    target_alt_layer=obs.mission_goal.target_alt_layer if obs.mission_goal.target_alt_layer is not None else obs.ownship_state.alt_layer
+                    target_alt_layer=safe_alt
                 )
             )
             

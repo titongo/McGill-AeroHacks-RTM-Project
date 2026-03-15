@@ -1,11 +1,24 @@
-from aerohacks.policy.base import Policy
-from aerohacks.core.models import Observation, Plan, ActionStep, ActionType, Position2D
+from aerohacks.policy.base import Policy #type: ignore
+from aerohacks.core.models import Observation, Plan, ActionStep, ActionType, Position2D #type: ignore
 import math
+
+# Proposed changes:
+# - If altitude change is needed:
+#   - Determine max vertical limit for the next step (e.g. 1 layer per step)
+#   - Calculate number of steps needed to reach target altitude at max vertical rate
+#   - Get distance to first point of contact with traffic / constraint at current altitude along direct path
+#   - Divide distance by number of steps needed to get step increment toward the goal that also allows for gradual altitude change to avoid traffic/constraints rather than trying to jump to a different altitude immediately which may not be possible within one step
+#   - Create step toward the goal with the calculated increment and altitude change, and save distance and remaining altitude change for the next step to continue adjusting in subsequent steps
+# - When detouring around traffic, step to the side (perpendicular to the direct path) rather than just stopping, to more quickly get around the hazard.
+# - If both direct and perpendicular paths are blocked, HOLD in place but keep checking for openings each subsequent step rather than giving up entirely. This allows for dynamic response to changing traffic and constraints rather than getting stuck in a HOLD state
+
 
 MIN_NORMAL_ALT = 1
 MAX_NORMAL_ALT = 4
 ADVISORY_SEPARATION = 180.0 # in meters, this is the threshold for triggering a detour around traffic
 DETOUR_OFFSET = 320.0 # in meters, how far to the side to step when detouring around traffic
+MAX_HORIZONTAL_SPEED = 15.0 # in m/s, maximum horizontal speed for calculating step increments
+MAX_VERTICAL_LIMIT = 1 # in altitude layers per step, maximum vertical change allowed in a single step
 
 def clamp_normal_alt(alt_layer: int) -> int:
     return max(MIN_NORMAL_ALT, min(MAX_NORMAL_ALT, int(alt_layer)))
@@ -109,7 +122,8 @@ class MyPolicy(Policy):
         dx = goal_pos.x - current_pos.x
         dy = goal_pos.y - current_pos.y
         dist = math.hypot(dx, dy)
-        speed = min(15.0, dist)
+        speed = min(MAX_HORIZONTAL_SPEED, dist)
+        vertical_speed = min(MAX_VERTICAL_LIMIT, abs(preferred_alt - obs.ownship_state.alt_layer))
 
         # Build unit vector toward the goal for detour direction calculations
         if dist > 0:
@@ -126,6 +140,7 @@ class MyPolicy(Policy):
             remaining_dx = goal_pos.x - next_pos.x
             remaining_dy = goal_pos.y - next_pos.y
             remaining_dist = math.hypot(remaining_dx, remaining_dy)
+            remaining_alt = preferred_alt - obs.ownship_state.alt_layer
 
             if remaining_dist > 0:
                 step_dist = min(speed, remaining_dist)

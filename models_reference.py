@@ -86,6 +86,11 @@ Your policy.py should import types like:
 #     current_time: int                       # Current simulation tick
 #     ownship_state: State                    # Your drone's current state
 #     mission_goal: GoalRegion                # Where you need to go
+#     map_boundaries: PolygonRegion           # Full map polygon
+#     start_state: State                      # Scenario start state
+#     permanent_constraints: List[Constraint] # All permanent constraints
+#     static_obstacles: List[Region]          # All static obstacles
+#     emergency_landing_sites: List[EmergencyLandingSite]  # All emergency sites
 #     active_constraints: List[Constraint]    # Currently active airspace constraints
 #     traffic_tracks: List[TrafficTrack]      # Other drones in the airspace
 

@@ -1,0 +1,73 @@
+{
+  "shrinking_notams": [
+    {
+      "id": "notam_mid_island",
+      "region": {
+        "vertices": [
+          {
+            "x": 15000,
+            "y": 23000
+          },
+          {
+            "x": 21000,
+            "y": 23000
+          },
+          {
+            "x": 21000,
+            "y": 28000
+          },
+          {
+            "x": 15000,
+            "y": 28000
+          }
+        ]
+      },
+      "alt_layers": [
+        1,
+        2
+      ],
+      "advisory_start_time": 900,
+      "controlled_start_time": 960,
+      "restricted_start_time": 1000,
+      "end_time": 2200
+    }
+  ],
+  "traffic_traces": [
+    {
+      "id": "npc_m2_1",
+      "segments": [
+        {
+          "start_pos": {
+            "x": 40000,
+            "y": 22000
+          },
+          "velocity": {
+            "x": -8,
+            "y": 0
+          },
+          "alt_layer": 2,
+          "start_time": 0,
+          "end_time": 5000
+        }
+      ]
+    },
+    {
+      "id": "npc_m2_2",
+      "segments": [
+        {
+          "start_pos": {
+            "x": 32000,
+            "y": 0
+          },
+          "velocity": {
+            "x": 0,
+            "y": 8
+          },
+          "alt_layer": 1,
+          "start_time": 0,
+          "end_time": 5000
+        }
+      ]
+    }
+  ]
+}

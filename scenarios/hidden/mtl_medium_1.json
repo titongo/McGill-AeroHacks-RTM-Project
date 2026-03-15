@@ -1,0 +1,41 @@
+{
+  "shrinking_notams": [],
+  "traffic_traces": [
+    {
+      "id": "npc_m1_1",
+      "segments": [
+        {
+          "start_pos": {
+            "x": 40000,
+            "y": 20000
+          },
+          "velocity": {
+            "x": -8,
+            "y": 0
+          },
+          "alt_layer": 2,
+          "start_time": 0,
+          "end_time": 5000
+        }
+      ]
+    },
+    {
+      "id": "npc_m1_2",
+      "segments": [
+        {
+          "start_pos": {
+            "x": 32000,
+            "y": 0
+          },
+          "velocity": {
+            "x": 0,
+            "y": 8
+          },
+          "alt_layer": 1,
+          "start_time": 0,
+          "end_time": 5000
+        }
+      ]
+    }
+  ]
+}

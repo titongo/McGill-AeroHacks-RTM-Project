@@ -19,6 +19,7 @@ ADVISORY_SEPARATION = 180.0 # in meters, this is the threshold for triggering a 
 DETOUR_OFFSET = 320.0 # in meters, how far to the side to step when detouring around traffic
 MAX_HORIZONTAL_SPEED = 15.0 # in m/s, maximum horizontal speed for calculating step increments
 MAX_VERTICAL_LIMIT = 1 # in altitude layers per step, maximum vertical change allowed in a single step
+ENERGY_DECAY_RATE = 0.1
 
 def clamp_normal_alt(alt_layer: int) -> int:
     return max(MIN_NORMAL_ALT, min(MAX_NORMAL_ALT, int(alt_layer)))
@@ -84,8 +85,8 @@ def in_active_constraint(pos: Position2D, alt: int, active_constraints) -> bool:
             return True
     return False
 
-def choose_safe_alt(pos: Position2D, preferred_alt: int, traffic_tracks, active_constraints):
-    # Choose a safe altitude layer for the given position; give preference to the preferred_alt but check all layers if needed
+# Given a desired altitude, return the best altitude that fits the scenario by checking for nearby traffic and active constraints. This allows the policy to adaptively choose a safe altitude layer rather than just trying to jump to the preferred altitude which may be blocked by traffic or constraints.
+def choose_safe_alt(pos: Position2D, preferred_alt: int, traffic_tracks, active_constraints) -> int | None:
     alt_order = [preferred_alt] + [a for a in range(MIN_NORMAL_ALT, MAX_NORMAL_ALT + 1) if a != preferred_alt]
     for alt in alt_order:
         if near_traffic(pos, alt, traffic_tracks):
@@ -94,6 +95,22 @@ def choose_safe_alt(pos: Position2D, preferred_alt: int, traffic_tracks, active_
             continue
         return alt
     return None
+
+def emergency_landing_required(obs: Observation) -> bool:
+    # Check for nearby emergency landing sites and return the site if the ownship is within a certain distance threshold of any site, indicating that an emergency landing may be required.
+    energy_remaining = obs.ownship_state.energy
+    distance_left = distance_2D(obs.ownship_state.position, obs.mission_goal.region.center())
+    emergency_landing_sites = obs.emergency_landing_sites
+    
+    for site in emergency_landing_sites:
+        site_distance = distance_2D(obs.ownship_state.position, site.position)
+        number_of_steps_to_goal = math.ceil(distance_left / MAX_HORIZONTAL_SPEED)
+
+        number_of_steps_possible_left = energy_remaining / ENERGY_DECAY_RATE
+        if site_distance < distance_left and number_of_steps_possible_left < number_of_steps_to_goal:
+            return True
+    return False
+
 
 class MyPolicy(Policy):
     """
@@ -111,19 +128,13 @@ class MyPolicy(Policy):
         goal_pos = obs.mission_goal.region.center()
         traffic = obs.traffic_tracks
         active_constraints = obs.active_constraints
-
-        desired_alt = (
-            obs.mission_goal.target_alt_layer
-            if obs.mission_goal.target_alt_layer is not None
-            else obs.ownship_state.alt_layer
-        )
-        preferred_alt = clamp_normal_alt(desired_alt)
+        
+        emergency_landing_required_flag = emergency_landing_required(obs)
 
         dx = goal_pos.x - current_pos.x
         dy = goal_pos.y - current_pos.y
         dist = math.hypot(dx, dy)
         speed = min(MAX_HORIZONTAL_SPEED, dist)
-        vertical_speed = min(MAX_VERTICAL_LIMIT, abs(preferred_alt - obs.ownship_state.alt_layer))
 
         # Build unit vector toward the goal for detour direction calculations
         if dist > 0:

@@ -1,0 +1,192 @@
+{
+  "shrinking_notams": [
+    {
+      "id": "notam_west_block",
+      "region": {
+        "vertices": [
+          {
+            "x": 13000,
+            "y": 17500
+          },
+          {
+            "x": 18000,
+            "y": 17500
+          },
+          {
+            "x": 18000,
+            "y": 23000
+          },
+          {
+            "x": 13000,
+            "y": 23000
+          }
+        ]
+      },
+      "alt_layers": [
+        1,
+        2
+      ],
+      "advisory_start_time": 300,
+      "controlled_start_time": 360,
+      "restricted_start_time": 400,
+      "end_time": 1600
+    },
+    {
+      "id": "notam_ne_squeeze",
+      "region": {
+        "vertices": [
+          {
+            "x": 33000,
+            "y": 30000
+          },
+          {
+            "x": 39000,
+            "y": 30000
+          },
+          {
+            "x": 39000,
+            "y": 35000
+          },
+          {
+            "x": 33000,
+            "y": 35000
+          }
+        ]
+      },
+      "alt_layers": [
+        1,
+        2
+      ],
+      "advisory_start_time": 2100,
+      "controlled_start_time": 2160,
+      "restricted_start_time": 2200,
+      "end_time": 3400
+    }
+  ],
+  "traffic_traces": [
+    {
+      "id": "npc_h2_fast_diag",
+      "segments": [
+        {
+          "start_pos": {
+            "x": 0,
+            "y": 2000
+          },
+          "velocity": {
+            "x": 10,
+            "y": 8
+          },
+          "alt_layer": 2,
+          "start_time": 0,
+          "end_time": 4000
+        }
+      ]
+    },
+    {
+      "id": "npc_h2_ew",
+      "segments": [
+        {
+          "start_pos": {
+            "x": 40000,
+            "y": 20000
+          },
+          "velocity": {
+            "x": -8,
+            "y": 0
+          },
+          "alt_layer": 2,
+          "start_time": 0,
+          "end_time": 5000
+        }
+      ]
+    },
+    {
+      "id": "npc_h2_final_approach",
+      "segments": [
+        {
+          "start_pos": {
+            "x": 36000,
+            "y": 28000
+          },
+          "velocity": {
+            "x": 0,
+            "y": 8
+          },
+          "alt_layer": 1,
+          "start_time": 2500,
+          "end_time": 5000
+        }
+      ]
+    },
+    {
+      "id": "npc_h2_zigzag",
+      "segments": [
+        {
+          "start_pos": {
+            "x": 15000,
+            "y": 20000
+          },
+          "velocity": {
+            "x": 10,
+            "y": 5
+          },
+          "alt_layer": 2,
+          "start_time": 600,
+          "end_time": 1100
+        },
+        {
+          "start_pos": {
+            "x": 20000,
+            "y": 22500
+          },
+          "velocity": {
+            "x": -8,
+            "y": 10
+          },
+          "alt_layer": 2,
+          "start_time": 1100,
+          "end_time": 1600
+        },
+        {
+          "start_pos": {
+            "x": 16000,
+            "y": 27500
+          },
+          "velocity": {
+            "x": 12,
+            "y": -5
+          },
+          "alt_layer": 2,
+          "start_time": 1600,
+          "end_time": 2100
+        },
+        {
+          "start_pos": {
+            "x": 22000,
+            "y": 25000
+          },
+          "velocity": {
+            "x": -5,
+            "y": 8
+          },
+          "alt_layer": 2,
+          "start_time": 2100,
+          "end_time": 2600
+        },
+        {
+          "start_pos": {
+            "x": 19500,
+            "y": 29000
+          },
+          "velocity": {
+            "x": 8,
+            "y": 3
+          },
+          "alt_layer": 2,
+          "start_time": 2600,
+          "end_time": 3100
+        }
+      ]
+    }
+  ]
+}

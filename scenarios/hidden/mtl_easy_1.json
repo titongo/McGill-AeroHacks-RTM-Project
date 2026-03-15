@@ -1,0 +1,23 @@
+{
+  "shrinking_notams": [],
+  "traffic_traces": [
+    {
+      "id": "npc_e1_1",
+      "segments": [
+        {
+          "start_pos": {
+            "x": 40000,
+            "y": 15000
+          },
+          "velocity": {
+            "x": -8,
+            "y": 0
+          },
+          "alt_layer": 1,
+          "start_time": 0,
+          "end_time": 5000
+        }
+      ]
+    }
+  ]
+}

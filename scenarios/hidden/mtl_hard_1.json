@@ -1,0 +1,130 @@
+{
+  "shrinking_notams": [
+    {
+      "id": "notam_west_approach",
+      "region": {
+        "vertices": [
+          {
+            "x": 13000,
+            "y": 18000
+          },
+          {
+            "x": 19000,
+            "y": 18000
+          },
+          {
+            "x": 19000,
+            "y": 24000
+          },
+          {
+            "x": 13000,
+            "y": 24000
+          }
+        ]
+      },
+      "alt_layers": [
+        1,
+        2
+      ],
+      "advisory_start_time": 400,
+      "controlled_start_time": 460,
+      "restricted_start_time": 500,
+      "end_time": 1800
+    }
+  ],
+  "traffic_traces": [
+    {
+      "id": "npc_h1_1",
+      "segments": [
+        {
+          "start_pos": {
+            "x": 40000,
+            "y": 20000
+          },
+          "velocity": {
+            "x": -8,
+            "y": 0
+          },
+          "alt_layer": 2,
+          "start_time": 0,
+          "end_time": 5000
+        }
+      ]
+    },
+    {
+      "id": "npc_h1_patrol",
+      "segments": [
+        {
+          "start_pos": {
+            "x": 26000,
+            "y": 28000
+          },
+          "velocity": {
+            "x": 6,
+            "y": 0
+          },
+          "alt_layer": 1,
+          "start_time": 0,
+          "end_time": 1000
+        },
+        {
+          "start_pos": {
+            "x": 32000,
+            "y": 28000
+          },
+          "velocity": {
+            "x": -6,
+            "y": 0
+          },
+          "alt_layer": 1,
+          "start_time": 1000,
+          "end_time": 2000
+        },
+        {
+          "start_pos": {
+            "x": 26000,
+            "y": 28000
+          },
+          "velocity": {
+            "x": 6,
+            "y": 0
+          },
+          "alt_layer": 1,
+          "start_time": 2000,
+          "end_time": 3000
+        },
+        {
+          "start_pos": {
+            "x": 32000,
+            "y": 28000
+          },
+          "velocity": {
+            "x": -6,
+            "y": 0
+          },
+          "alt_layer": 1,
+          "start_time": 3000,
+          "end_time": 5000
+        }
+      ]
+    },
+    {
+      "id": "npc_h1_goal",
+      "segments": [
+        {
+          "start_pos": {
+            "x": 25000,
+            "y": 40000
+          },
+          "velocity": {
+            "x": 4.8,
+            "y": -1.52
+          },
+          "alt_layer": 1,
+          "start_time": 0,
+          "end_time": 5000
+        }
+      ]
+    }
+  ]
+}

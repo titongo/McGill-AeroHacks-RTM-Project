@@ -1,0 +1,113 @@
+{
+  "scenario_id": "mtl_easy_1",
+  "map_boundaries": {
+    "vertices": [
+      {
+        "x": 0,
+        "y": 0
+      },
+      {
+        "x": 40000,
+        "y": 0
+      },
+      {
+        "x": 40000,
+        "y": 40000
+      },
+      {
+        "x": 0,
+        "y": 40000
+      }
+    ]
+  },
+  "start_state": {
+    "position": {
+      "x": 1800,
+      "y": 1700
+    },
+    "alt_layer": 2,
+    "energy": 420
+  },
+  "mission_goal": {
+    "region": {
+      "vertices": [
+        {
+          "x": 36000,
+          "y": 35200
+        },
+        {
+          "x": 38000,
+          "y": 35200
+        },
+        {
+          "x": 38000,
+          "y": 37200
+        },
+        {
+          "x": 36000,
+          "y": 37200
+        }
+      ]
+    },
+    "target_alt_layer": 1
+  },
+  "permanent_constraints": [
+    {
+      "id": "yul_ctr",
+      "region": {
+        "type": "CircleRegion",
+        "center_pos": {
+          "x": 8000,
+          "y": 16800
+        },
+        "radius": 4200
+      },
+      "alt_layers": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "phase": "RESTRICTED",
+      "start_time": 0
+    }
+  ],
+  "static_obstacles": [],
+  "emergency_landing_sites": [
+    {
+      "id": "els_dorval",
+      "region": {
+        "type": "CircleRegion",
+        "center_pos": {
+          "x": 5000,
+          "y": 14500
+        },
+        "radius": 500
+      }
+    },
+    {
+      "id": "els_ne",
+      "region": {
+        "type": "CircleRegion",
+        "center_pos": {
+          "x": 37000,
+          "y": 36200
+        },
+        "radius": 600
+      }
+    }
+  ],
+  "vehicle_limits": {
+    "max_horizontal_speed": 15.0,
+    "max_vertical_rate": 1,
+    "min_alt_layer": 1,
+    "max_alt_layer": 4,
+    "energy_decay_rate": 0.1
+  },
+  "scoring_config": {
+    "base_success_score": 1000,
+    "time_bonus_multiplier": 10,
+    "safe_emergency_landing_score": 300
+  }
+}

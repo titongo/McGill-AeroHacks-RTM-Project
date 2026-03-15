@@ -14,14 +14,14 @@ def distance_2D(a: Position2D, b: Position2D) -> float:
     return math.hypot(a.x - b.x, a.y - b.y)
 
 def near_traffic(pos: Position2D, alt: int, traffic_tracks) -> bool:
-    """Return True if pos is within ADVISORY_SEPARATION of any traffic at the same altitude layer."""
+    # Return True if pos is within ADVISORY_SEPARATION of any traffic at the same altitude layer.
     for t in traffic_tracks:
         if t.alt_layer == alt and distance_2D(pos, t.position) <= ADVISORY_SEPARATION:
             return True
     return False
 
 def point_in_polygon(p: Position2D, vertices) -> bool:
-    """Ray-casting point-in-polygon test."""
+    # Ray-casting point-in-polygon test.
     inside = False
     n = len(vertices)
     if n < 3:
@@ -71,6 +71,17 @@ def in_active_constraint(pos: Position2D, alt: int, active_constraints) -> bool:
             return True
     return False
 
+def choose_safe_alt(pos: Position2D, preferred_alt: int, traffic_tracks, active_constraints):
+    # Choose a safe altitude layer for the given position; give preference to the preferred_alt but check all layers if needed
+    alt_order = [preferred_alt] + [a for a in range(MIN_NORMAL_ALT, MAX_NORMAL_ALT + 1) if a != preferred_alt]
+    for alt in alt_order:
+        if near_traffic(pos, alt, traffic_tracks):
+            continue
+        if in_active_constraint(pos, alt, active_constraints):
+            continue
+        return alt
+    return None
+
 class MyPolicy(Policy):
     """
     NEW ALGORITHM:
@@ -93,7 +104,7 @@ class MyPolicy(Policy):
             if obs.mission_goal.target_alt_layer is not None
             else obs.ownship_state.alt_layer
         )
-        safe_alt = clamp_normal_alt(desired_alt)
+        preferred_alt = clamp_normal_alt(desired_alt)
 
         dx = goal_pos.x - current_pos.x
         dy = goal_pos.y - current_pos.y
@@ -126,13 +137,14 @@ class MyPolicy(Policy):
             else:
                 candidate = Position2D(x=goal_pos.x, y=goal_pos.y)
 
-            if (not near_traffic(candidate, safe_alt, traffic)) and (not in_active_constraint(candidate, safe_alt, active_constraints)):
+            candidate_alt = choose_safe_alt(candidate, preferred_alt, traffic, active_constraints)
+            if candidate_alt is not None:
                 # Direct path is clear -> proceed toward the goal
                 next_pos = candidate
                 steps.append(ActionStep(
                     action_type=ActionType.WAYPOINT,
                     target_position=next_pos,
-                    target_alt_layer=safe_alt,
+                    target_alt_layer=candidate_alt,
                 ))
             else:
                 # Direct path blocked —> try perpendicular detours
@@ -144,20 +156,22 @@ class MyPolicy(Policy):
                     x=next_pos.x + ux * speed + perp_right[0] * DETOUR_OFFSET,
                     y=next_pos.y + uy * speed + perp_right[1] * DETOUR_OFFSET,
                 )
+                left_alt = choose_safe_alt(left_pos, preferred_alt, traffic, active_constraints)
+                right_alt = choose_safe_alt(right_pos, preferred_alt, traffic, active_constraints)
                 # Check left detour first, then right
-                if (not near_traffic(left_pos, safe_alt, traffic)) and (not in_active_constraint(left_pos, safe_alt, active_constraints)):
+                if left_alt is not None:
                     next_pos = left_pos
                     steps.append(ActionStep(
                         action_type=ActionType.WAYPOINT,
                         target_position=next_pos,
-                        target_alt_layer=safe_alt,
+                        target_alt_layer=left_alt,
                     ))
-                elif (not near_traffic(right_pos, safe_alt, traffic)) and (not in_active_constraint(right_pos, safe_alt, active_constraints)):
+                elif right_alt is not None:
                     next_pos = right_pos
                     steps.append(ActionStep(
                         action_type=ActionType.WAYPOINT,
                         target_position=next_pos,
-                        target_alt_layer=safe_alt,
+                        target_alt_layer=right_alt,
                     ))
                 else:
                     # Both detours also blocked — hold in place this step

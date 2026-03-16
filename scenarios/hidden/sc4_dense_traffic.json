@@ -1,0 +1,91 @@
+{
+  "shrinking_notams": [],
+  "traffic_traces": [
+    {
+      "id": "t1_headon_alt2",
+      "segments": [
+        {
+          "start_time": 0,
+          "end_time": 3800,
+          "start_pos": {"x": 14000, "y": 13000},
+          "velocity": {"x": -3.0, "y": 10.0},
+          "alt_layer": 2
+        }
+      ]
+    },
+    {
+      "id": "t2_side_alt2",
+      "segments": [
+        {
+          "start_time": 0,
+          "end_time": 3800,
+          "start_pos": {"x": 2000, "y": 14000},
+          "velocity": {"x": 11.0, "y": 4.0},
+          "alt_layer": 2
+        }
+      ]
+    },
+    {
+      "id": "t3_south_alt1",
+      "segments": [
+        {
+          "start_time": 0,
+          "end_time": 3800,
+          "start_pos": {"x": 8000, "y": 2000},
+          "velocity": {"x": 3.0, "y": 11.0},
+          "alt_layer": 1
+        }
+      ]
+    },
+    {
+      "id": "t4_ne_alt3",
+      "segments": [
+        {
+          "start_time": 0,
+          "end_time": 3800,
+          "start_pos": {"x": 20000, "y": 20000},
+          "velocity": {"x": -8.0, "y": -6.0},
+          "alt_layer": 3
+        }
+      ]
+    },
+    {
+      "id": "t5_trailer_alt2",
+      "segments": [
+        {
+          "start_time": 0,
+          "end_time": 3800,
+          "start_pos": {"x": 500, "y": 400},
+          "velocity": {"x": 14.5, "y": 14.0},
+          "alt_layer": 2
+        }
+      ]
+    },
+    {
+      "id": "t6_zigzag_alt2",
+      "segments": [
+        {
+          "start_time": 0,
+          "end_time": 600,
+          "start_pos": {"x": 12000, "y": 2000},
+          "velocity": {"x": -2.0, "y": 12.0},
+          "alt_layer": 2
+        },
+        {
+          "start_time": 600,
+          "end_time": 1400,
+          "start_pos": {"x": 10800, "y": 9200},
+          "velocity": {"x": 5.0, "y": 8.0},
+          "alt_layer": 2
+        },
+        {
+          "start_time": 1400,
+          "end_time": 3800,
+          "start_pos": {"x": 14800, "y": 15600},
+          "velocity": {"x": 8.0, "y": 8.0},
+          "alt_layer": 2
+        }
+      ]
+    }
+  ]
+}

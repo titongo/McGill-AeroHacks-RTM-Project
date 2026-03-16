@@ -70,7 +70,23 @@ def corner_bisector(prev: Position2D, curr: Position2D, nxt: Position2D):
 
     return bx, by, scale
 
+def signed_area(verts) -> float:
+    """Positive = CCW, negative = CW (standard math coords, y-up)."""
+    n, a = len(verts), 0.0
+    for i in range(n):
+        j = (i + 1) % n
+        a += verts[i].x * verts[j].y - verts[j].x * verts[i].y
+    return a * 0.5
+
+
 def expand_poly(verts: list, margin: float) -> list:
+    """
+    Expand each vertex outward along the corner bisector by margin.
+    Detects polygon winding order so the bisector always points away
+    from the interior, regardless of how the vertices are wound.
+    For CCW polygons the raw (e1+e2) bisector points inward — it is negated.
+    """
+    ccw = signed_area(verts) > 0
     n   = len(verts)
     out = []
     for i in range(n):
@@ -80,6 +96,8 @@ def expand_poly(verts: list, margin: float) -> list:
             out.append(curr)
         else:
             bx, by, scale = result
+            if ccw:
+                bx, by = -bx, -by   # flip to outward for CCW winding
             out.append(Position2D(x=curr.x + bx * margin * scale,
                                   y=curr.y + by * margin * scale))
     return out
@@ -99,4 +117,14 @@ def expand_region(region, margin: float) -> list | None:
         return circle_to_verts(expand_circle(region, margin))
     if isinstance(region, PolygonRegion):
         return expand_poly(list(region.vertices), margin)
+    return None
+
+def region_centroid(region) -> Position2D | None:
+    if isinstance(region, CircleRegion):
+        return region.center_pos
+    if isinstance(region, PolygonRegion):
+        verts = region.vertices
+        n     = len(verts)
+        return Position2D(x=sum(v.x for v in verts) / n,
+                          y=sum(v.y for v in verts) / n)
     return None

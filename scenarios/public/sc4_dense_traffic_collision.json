@@ -1,0 +1,19 @@
+{
+  "_comment": "STRESS: 6 NPCs converging on the drone's expected mid-flight position at t~800. Two at same alt, two at ±1 alt (conflict range). Tests VO + MPC joint scoring avoids collisions without getting stuck.",
+  "scenario_id": "sc4_dense_traffic_collision",
+  "map_boundaries": {"vertices": [{"x":0,"y":0},{"x":40000,"y":0},{"x":40000,"y":40000},{"x":0,"y":40000}]},
+  "permanent_constraints": [],
+  "static_obstacles": [],
+  "emergency_landing_sites": [
+    {"id": "els_mid", "region": {"vertices": [{"x":11500,"y":11500},{"x":12500,"y":11500},{"x":12500,"y":12500},{"x":11500,"y":12500}]}},
+    {"id": "els_ne",  "region": {"vertices": [{"x":35500,"y":34500},{"x":36500,"y":34500},{"x":36500,"y":35500},{"x":35500,"y":35500}]}}
+  ],
+  "mission_goal": {
+    "region": {"vertices": [{"x":36000,"y":35200},{"x":38000,"y":35200},{"x":38000,"y":37200},{"x":36000,"y":37200}]},
+    "target_alt_layer": 2
+  },
+  "vehicle_limits": {"max_horizontal_speed": 15.0, "max_vertical_rate": 1, "energy_decay_rate": 0.1, "energy_reserve_threshold": 20.0},
+  "scoring_config": {"base_success_score": 1000.0, "safe_emergency_landing_score": 300.0, "controlled_phase_penalty": -50.0, "restricted_phase_penalty": -200.0, "separation_loss_penalty_advisory": -10.0, "separation_loss_penalty_conflict": -150.0, "collision_penalty": -500.0, "battery_breach_penalty": -500.0, "time_bonus_multiplier": 10.0, "max_time": 3800},
+  "start_state": {"position": {"x": 1800, "y": 1700}, "alt_layer": 2, "energy": 420.0, "velocity": {"x": 0.0, "y": 0.0}, "heading": 0.0},
+  "baseline_traffic_corridors": []
+}

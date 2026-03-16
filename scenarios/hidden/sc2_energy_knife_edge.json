@@ -1,0 +1,55 @@
+{
+  "shrinking_notams": [
+    {
+      "id": "notam_central_block",
+      "region": {
+        "type": "PolygonRegion",
+        "vertices": [
+          {
+            "x": 14000,
+            "y": 15000
+          },
+          {
+            "x": 26000,
+            "y": 15000
+          },
+          {
+            "x": 26000,
+            "y": 27000
+          },
+          {
+            "x": 14000,
+            "y": 27000
+          }
+        ]
+      },
+      "alt_layers": [
+        1,
+        2
+      ],
+      "advisory_start_time": 500,
+      "controlled_start_time": 700,
+      "restricted_start_time": 800
+    }
+  ],
+  "traffic_traces": [
+    {
+      "id": "t1",
+      "segments": [
+        {
+          "start_time": 400,
+          "end_time": 3800,
+          "start_pos": {
+            "x": 35000,
+            "y": 34000
+          },
+          "velocity": {
+            "x": -13.5,
+            "y": -13.0
+          },
+          "alt_layer": 2
+        }
+      ]
+    }
+  ]
+}

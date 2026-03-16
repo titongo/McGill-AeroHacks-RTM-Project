@@ -1,6 +1,6 @@
 from aerohacks.core.models import Position2D, ConstraintPhase
 from geometry import *
-from consts imoprt *
+from consts import *
 import math
 
 

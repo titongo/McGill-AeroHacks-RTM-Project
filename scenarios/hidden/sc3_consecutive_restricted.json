@@ -1,0 +1,106 @@
+{
+  "shrinking_notams": [
+    {
+      "id": "notam_corridor_south",
+      "region": {
+        "type": "PolygonRegion",
+        "vertices": [
+          {
+            "x": 15000,
+            "y": 14000
+          },
+          {
+            "x": 22000,
+            "y": 14000
+          },
+          {
+            "x": 22000,
+            "y": 20000
+          },
+          {
+            "x": 15000,
+            "y": 20000
+          }
+        ]
+      },
+      "alt_layers": [
+        1,
+        2,
+        3
+      ],
+      "advisory_start_time": 300,
+      "controlled_start_time": 450,
+      "restricted_start_time": 600
+    },
+    {
+      "id": "notam_corridor_north",
+      "region": {
+        "type": "PolygonRegion",
+        "vertices": [
+          {
+            "x": 15000,
+            "y": 20000
+          },
+          {
+            "x": 22000,
+            "y": 20000
+          },
+          {
+            "x": 22000,
+            "y": 32000
+          },
+          {
+            "x": 15000,
+            "y": 32000
+          }
+        ]
+      },
+      "alt_layers": [
+        1,
+        2,
+        3
+      ],
+      "advisory_start_time": 350,
+      "controlled_start_time": 500,
+      "restricted_start_time": 650
+    }
+  ],
+  "traffic_traces": [
+    {
+      "id": "t1",
+      "segments": [
+        {
+          "start_time": 0,
+          "end_time": 3800,
+          "start_pos": {
+            "x": 18000,
+            "y": 2000
+          },
+          "velocity": {
+            "x": 0.0,
+            "y": 11.0
+          },
+          "alt_layer": 4
+        }
+      ]
+    },
+    {
+      "id": "t2",
+      "segments": [
+        {
+          "start_time": 0,
+          "end_time": 3800,
+          "start_pos": {
+            "x": 38000,
+            "y": 15000
+          },
+          "velocity": {
+            "x": -8.0,
+            "y": 5.0
+          },
+          "alt_layer": 2
+        }
+      ]
+    }
+  ]
+}
